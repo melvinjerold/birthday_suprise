@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Surprise 💖</title>
+
+<style>
+body{
+margin:0;
+font-family:Segoe UI;
+overflow:hidden;
+background:black;
+color:white;
+}
+
+/* ---------------- LOCK ---------------- */
+.lock{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+position:relative;
+}
+
+.lock::before{
+content:"";
+position:absolute;
+inset:0;
+background:url("img10.jpeg") center/cover no-repeat;
+filter:blur(8px) brightness(0.5);
+animation:water 8s infinite alternate ease-in-out;
+}
+
+@keyframes water{
+0%{transform:scale(1.05);}
+50%{transform:scale(1.1) translate(-10px,10px);}
+100%{transform:scale(1.15) translate(10px,-10px);}
+}
+
+.lockBox{
+position:relative;
+z-index:2;
+text-align:center;
+}
+
+.title{font-size:24px;font-weight:bold;margin-bottom:10px;}
+
+.dots{
+display:flex;
+gap:10px;
+justify-content:center;
+margin-bottom:20px;
+}
+
+.dot{
+width:14px;
+height:14px;
+border-radius:50%;
+border:2px solid white;
+}
+
+.filled{background:white;transform:scale(1.2);}
+
+.keypad{
+display:grid;
+grid-template-columns:repeat(3,70px);
+gap:10px;
+justify-content:center;
+}
+
+.key{
+width:65px;
+height:65px;
+border-radius:50%;
+background:rgba(255,255,255,0.15);
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+}
+
+/* ---------------- SURPRISE ---------------- */
+.surprise{
+display:none;
+height:100vh;
+position:relative;
+}
+
+.grid{
+position:absolute;
+width:100%;
+height:100%;
+display:grid;
+grid-template-columns:repeat(5,1fr);
+grid-auto-rows:100px;
+}
+
+.grid img{
+width:100%;
+height:100%;
+object-fit:cover;
+opacity:0.6;
+}
+
+#btn{
+position:absolute;
+padding:12px 20px;
+border-radius:25px;
+border:none;
+background:white;
+color:#ff4b7d;
+font-weight:bold;
+cursor:pointer;
+transition:all 0.3s ease;
+}
+
+/* HEART */
+#btn.heart{
+width:80px;
+height:80px;
+background:#ff4b7d;
+transform:rotate(-45deg);
+border-radius:0;
+animation:pulse 1s infinite;
+padding:0;
+}
+
+#btn.heart::before,
+#btn.heart::after{
+content:"";
+position:absolute;
+width:80px;
+height:80px;
+background:#ff4b7d;
+border-radius:50%;
+}
+
+#btn.heart::before{top:-40px;left:0;}
+#btn.heart::after{left:40px;top:0;}
+
+@keyframes pulse{
+0%{transform:rotate(-45deg) scale(1);}
+50%{transform:rotate(-45deg) scale(1.1);}
+100%{transform:rotate(-45deg) scale(1);}
+}
+
+/* ---------------- FINAL PAGE ---------------- */
+.final{
+display:none;
+height:100vh;
+width:100%;
+position:relative;
+overflow:hidden;
+}
+
+.bg{
+position:absolute;
+width:100%;
+height:100%;
+z-index:0;
+}
+
+.bg img{
+position:absolute;
+width:100%;
+height:100%;
+object-fit:cover;
+opacity:0;
+filter:blur(6px) brightness(0.4);
+transition:opacity 1s ease-in-out;
+}
+
+.bg img.active{opacity:1;}
+
+.left{
+position:absolute;
+left:0;
+top:0;
+width:60%;
+height:100%;
+z-index:2;
+}
+
+.left img{
+position:absolute;
+width:100%;
+height:100%;
+object-fit:contain;
+opacity:0;
+transition:opacity 2s ease-in-out;
+}
+
+.left img.show{opacity:0.95;}
+
+.right{
+position:absolute;
+right:0;
+top:0;
+width:40%;
+height:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:3;
+}
+
+.glass{
+background:rgba(255,255,255,0.2);
+backdrop-filter:blur(15px);
+padding:25px;
+border-radius:20px;
+width:80%;
+text-align:center;
+}
+
+.cursor{
+display:inline-block;
+width:2px;
+background:white;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{50%{opacity:0;}}
+</style>
+</head>
+
+<body>
+
+<!-- 🎵 MUSIC -->
+<audio id="song1" src="song1.mp3" loop></audio>
+<audio id="song2" src="song.mp3" loop></audio>
+
+<!-- LOCK -->
+<div class="lock" id="lock">
+<div class="lockBox">
+<div class="title">Welcome 🎉</div>
+<div class="title">Please Enter your Birthdate</div>
+
+<div class="dots">
+<div class="dot"></div><div class="dot"></div>
+<div class="dot"></div><div class="dot"></div>
+</div>
+
+<div class="keypad">
+<div class="key" onclick="press(1)">1</div>
+<div class="key" onclick="press(2)">2</div>
+<div class="key" onclick="press(3)">3</div>
+<div class="key" onclick="press(4)">4</div>
+<div class="key" onclick="press(5)">5</div>
+<div class="key" onclick="press(6)">6</div>
+<div class="key" onclick="press(7)">7</div>
+<div class="key" onclick="press(8)">8</div>
+<div class="key" onclick="press(9)">9</div>
+<div></div>
+<div class="key" onclick="press(0)">0</div>
+<div class="key" onclick="clearCode()">⌫</div>
+</div>
+</div>
+</div>
+
+<!-- SURPRISE -->
+<div class="surprise" id="surprise">
+<div class="grid" id="grid"></div>
+<button id="btn">Open Surprise 🎁</button>
+</div>
+
+<!-- FINAL -->
+<div class="final" id="final">
+<div class="bg" id="bg"></div>
+
+<div class="left">
+<img id="a">
+<img id="b">
+</div>
+
+<div class="right">
+<div class="glass" id="letter"></div>
+</div>
+</div>
+
+<script>
+
+let code="";
+let index=0;
+let musicStarted=false;
+
+const song1=document.getElementById("song1");
+const song2=document.getElementById("song2");
+
+/* 🎵 SAFE MUSIC START */
+function startMusic(){
+if(!musicStarted){
+song1.play().catch(()=>{});
+musicStarted=true;
+}
+}
+
+/* ---------------- LOCK ---------------- */
+function press(n){
+
+startMusic();
+
+if(code.length<4){
+code+=n;
+updateDots();
+
+if(code==="0205"){
+goSurprise();
+}
+}
+}
+
+function clearCode(){
+code="";
+updateDots();
+}
+
+function updateDots(){
+document.querySelectorAll(".dot").forEach((d,i)=>{
+d.classList.toggle("filled", i<code.length);
+});
+}
+
+/* ---------------- SURPRISE ---------------- */
+function goSurprise(){
+lock.style.display="none";
+surprise.style.display="block";
+
+/* RESET GRID */
+grid.innerHTML="";
+
+/* LOAD GRID */
+loadGrid();
+
+/* RESET BUTTON */
+btn.style.left="50%";
+btn.style.top="50%";
+btn.classList.remove("heart");
+btn.innerText="Open Surprise 🎁";
+
+/* MUSIC CONTINUES */
+song1.play().catch(()=>{});
+
+/* BUTTON LOGIC */
+startButton();
+}
+
+/* GRID */
+function loadGrid(){
+for(let i=1;i<=50;i++){
+let img=document.createElement("img");
+img.src="img"+i+".jpeg";
+grid.appendChild(img);
+}
+}
+
+/* BUTTON */
+const btn=document.getElementById("btn");
+
+function startButton(){
+
+let attempts = 0;
+
+/* your full messages */
+const messages=[
+"Try again 😄",
+"Catch me 😏",
+"Not so fast 😎",
+"Keep trying 💪",
+"Almost 💖",
+"One more 😳",
+"Almost there 🔥",
+"Ok last 💖",
+"Now enter 💖",
+"Ready 💖"
+];
+
+btn.onmouseenter = function(){
+
+if(attempts < messages.length){
+
+/* ✅ show message based on attempt */
+btn.innerText = messages[attempts];
+
+let pos=[
+"50% 50%","10% 80%","80% 10%","50% 80%","10% 10%",
+"80% 50%","30% 30%","70% 70%","20% 60%","60% 20%"
+];
+
+btn.style.left = pos[attempts].split(" ")[0];
+btn.style.top = pos[attempts].split(" ")[1];
+
+btn.style.transform = "translate(-50%,-50%)";
+
+attempts++;
+
+}else{
+
+btn.classList.add("heart");
+btn.innerText = "";
+btn.onclick = startFinal;
+}
+};
+}
+
+/* ---------------- FINAL ---------------- */
+function startFinal(){
+
+surprise.style.display="none";
+final.style.display="block";
+
+/* SWITCH MUSIC */
+song1.pause();
+song2.play().catch(()=>{});
+
+loadBg();
+startBg();
+startSlide();
+startTyping();
+}
+
+/* BACKGROUND */
+function loadBg(){
+bg.innerHTML="";
+for(let i=1;i<=50;i++){
+let img=document.createElement("img");
+img.src="img"+i+".jpeg";
+bg.appendChild(img);
+}
+}
+
+function startBg(){
+let imgs=document.querySelectorAll(".bg img");
+
+index=0;
+imgs[0].classList.add("active");
+
+setInterval(()=>{
+imgs.forEach(i=>i.classList.remove("active"));
+index=(index+1)%imgs.length;
+imgs[index].classList.add("active");
+},2000);
+}
+
+/* SLIDESHOW */
+function startSlide(){
+
+let a=document.getElementById("a");
+let b=document.getElementById("b");
+
+index=0;
+
+a.src="img1.jpeg";
+b.src="img1.jpeg";
+
+a.classList.add("show");
+
+setInterval(()=>{
+
+let src="img"+(index+1)+".jpeg";
+
+if(a.classList.contains("show")){
+b.src=src;
+b.classList.add("show");
+a.classList.remove("show");
+}else{
+a.src=src;
+a.classList.add("show");
+b.classList.remove("show");
+}
+
+index=(index+1)%50;
+},2000);
+}
+
+/* TYPEWRITER */
+function startTyping(){
+
+const msg=`Happy 25th Birthday 💖
+You are my everything ❤️
+Our journey started from strangers...`;
+
+let i=0;
+letter.innerHTML=`<span id="text"></span><span class="cursor"></span>`;
+let t=document.getElementById("text");
+
+function type(){
+if(i<msg.length){
+t.innerHTML+=msg[i++];
+setTimeout(type,30);
+}
+}
+type();
+}
+
+</script>
+
+</body>
+</html>
